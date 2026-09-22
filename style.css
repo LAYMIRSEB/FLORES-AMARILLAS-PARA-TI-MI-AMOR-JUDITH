@@ -1,0 +1,722 @@
+/* =========================================================
+   ESTILOS GENERALES Y VARIABLES DE COLOR
+   ========================================================= */
+
+:root {
+    --gold-primary: #ffd700;
+    --gold-bright: #ffea00;
+    --gold-neon: #fff275;
+    --gold-glow: rgba(255, 215, 0, 0.85);
+    --gold-soft: rgba(255, 235, 59, 0.25);
+    --dark-bg: #000000;
+    --card-bg: rgba(18, 18, 22, 0.78);
+    --card-border: rgba(255, 215, 0, 0.35);
+    --text-light: #ffffff;
+    --text-muted: rgba(255, 255, 255, 0.75);
+    --font-heading: 'Caveat', cursive, sans-serif;
+    --font-body: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-serif: 'Playfair Display', Georgia, serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--dark-bg);
+    color: var(--text-light);
+    font-family: var(--font-body);
+}
+
+/* =========================================================
+   CANVAS 3D THREE.JS
+   ========================================================= */
+
+#galaxyCanvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1;
+    display: block;
+    cursor: grab;
+}
+
+#galaxyCanvas:active {
+    cursor: grabbing;
+}
+
+/* =========================================================
+   CONTENEDOR DE INTERFAZ (UI OVERLAY)
+   ========================================================= */
+
+.ui-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+    pointer-events: none; /* Permite arrastrar la galaxia en el fondo */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: clamp(12px, 3vh, 24px) clamp(14px, 4vw, 32px);
+}
+
+/* =========================================================
+   ENCABEZADO NEÓN SUPERIOR (IDÉNTICO A LA IMAGEN)
+   ========================================================= */
+
+.header-neon {
+    text-align: center;
+    pointer-events: auto;
+    animation: fadeInDown 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.neon-sub {
+    font-family: var(--font-heading);
+    font-size: clamp(1.8rem, 4.5vw, 3rem);
+    font-weight: 700;
+    color: #fffde0;
+    text-shadow: 
+        0 0 7px #ffeb3b,
+        0 0 15px #ffd600,
+        0 0 30px #ffab00,
+        0 0 50px rgba(255, 171, 0, 0.6);
+    letter-spacing: 2px;
+    line-height: 1.1;
+    margin-bottom: -4px;
+}
+
+.neon-main {
+    font-family: var(--font-heading);
+    font-size: clamp(2.4rem, 6.5vw, 4.5rem);
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 
+        0 0 10px #ffe600,
+        0 0 25px #ffc107,
+        0 0 45px #ff9800,
+        0 0 70px rgba(255, 152, 0, 0.7);
+    letter-spacing: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    line-height: 1.15;
+    animation: neonPulse 3s ease-in-out infinite alternate;
+}
+
+.sunflower-emoji {
+    display: inline-block;
+    filter: drop-shadow(0 0 12px rgba(255, 215, 0, 0.9));
+    transform-origin: center;
+    animation: gentleRotate 8s linear infinite;
+}
+
+.neon-recipient {
+    font-family: var(--font-body);
+    font-size: clamp(0.9rem, 2.2vw, 1.2rem);
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.92);
+    margin-top: 6px;
+    letter-spacing: 1.5px;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.7);
+}
+
+.name-highlight {
+    color: var(--gold-bright);
+    font-weight: 700;
+    font-family: var(--font-serif);
+    font-size: 1.15em;
+    text-shadow: 0 0 15px var(--gold-bright), 0 0 30px #ff9800;
+}
+
+/* =========================================================
+   INDICADOR DE INTERACCIÓN
+   ========================================================= */
+
+.interaction-hint {
+    align-self: center;
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    padding: 6px 18px;
+    border-radius: 30px;
+    font-size: clamp(0.72rem, 1.8vw, 0.88rem);
+    color: rgba(255, 255, 255, 0.85);
+    letter-spacing: 0.5px;
+    pointer-events: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+    animation: fadeIn 2s ease-in-out forwards;
+    transition: opacity 0.5s ease;
+}
+
+/* =========================================================
+   BOTÓN PROMPT DE INICIO (SI AUTOPLAY REQUIERE TOQUE)
+   ========================================================= */
+
+.start-prompt {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 25;
+    pointer-events: auto;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.start-prompt.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.start-btn {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.9), rgba(255, 152, 0, 0.85));
+    border: 1px solid #fff3b0;
+    color: #1a1200;
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: clamp(0.95rem, 2.4vw, 1.15rem);
+    padding: 14px 28px;
+    border-radius: 40px;
+    cursor: pointer;
+    box-shadow: 
+        0 0 25px rgba(255, 215, 0, 0.7),
+        0 10px 30px rgba(0, 0, 0, 0.6);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: startPulse 2s infinite;
+}
+
+.start-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 
+        0 0 40px rgba(255, 215, 0, 0.95),
+        0 15px 35px rgba(0, 0, 0, 0.7);
+}
+
+.start-btn:active {
+    transform: scale(0.98);
+}
+
+/* =========================================================
+   TARJETA INFERIOR (ESTILO TIKTOK / REDES / ROMÁNTICO)
+   ========================================================= */
+
+.bottom-card {
+    pointer-events: auto;
+    background: var(--card-bg);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: clamp(14px, 2.5vw, 20px);
+    max-width: 580px;
+    width: 100%;
+    margin: 0 auto;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.7),
+        0 0 20px rgba(255, 215, 0, 0.12);
+    animation: fadeInUp 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.author-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.author-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffe600, #ff8c00);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    box-shadow: 0 0 14px rgba(255, 215, 0, 0.6);
+    flex-shrink: 0;
+}
+
+.author-info {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.author-name {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.heart-icon {
+    font-size: 0.9em;
+}
+
+.flower-icon {
+    font-size: 1em;
+}
+
+.author-sub {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+}
+
+.letter-trigger-btn {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.25), rgba(255, 165, 0, 0.35));
+    border: 1px solid rgba(255, 215, 0, 0.6);
+    color: #fff7cc;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.letter-trigger-btn:hover {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.45), rgba(255, 165, 0, 0.55));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+.bottom-caption {
+    font-size: clamp(0.85rem, 2vw, 0.95rem);
+    line-height: 1.45;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 12px;
+}
+
+.caption-quote {
+    display: block;
+    color: var(--gold-bright);
+    font-style: italic;
+    font-size: 0.92em;
+    margin-top: 4px;
+}
+
+/* =========================================================
+   BARRA DE MÚSICA RÍO ROMA
+   ========================================================= */
+
+.music-player-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 215, 0, 0.25);
+    border-radius: 14px;
+    padding: 8px 14px;
+}
+
+.music-control-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--gold-primary);
+    border: none;
+    color: #120e00;
+    font-size: 14px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.6);
+    transition: all 0.25s ease;
+    flex-shrink: 0;
+}
+
+.music-control-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 18px rgba(255, 215, 0, 0.9);
+}
+
+.music-control-btn.playing {
+    background: #ffea00;
+    box-shadow: 0 0 20px #ffea00;
+}
+
+.music-track-info {
+    flex-grow: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.track-marquee {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 0.86rem;
+    font-weight: 600;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.music-note-icon {
+    color: var(--gold-bright);
+    font-size: 1.1em;
+}
+
+.track-status {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+/* Ondas de audio animadas */
+.sound-waves {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 18px;
+    padding: 0 4px;
+}
+
+.sound-waves .bar {
+    width: 3px;
+    background: var(--gold-primary);
+    border-radius: 2px;
+    height: 4px;
+    transition: height 0.2s ease;
+}
+
+.sound-waves.active .bar:nth-child(1) {
+    animation: waveBounce 0.8s ease-in-out infinite alternate;
+}
+
+.sound-waves.active .bar:nth-child(2) {
+    animation: waveBounce 1.1s ease-in-out 0.2s infinite alternate;
+}
+
+.sound-waves.active .bar:nth-child(3) {
+    animation: waveBounce 0.9s ease-in-out 0.4s infinite alternate;
+}
+
+.sound-waves.active .bar:nth-child(4) {
+    animation: waveBounce 1.2s ease-in-out 0.1s infinite alternate;
+}
+
+/* =========================================================
+   MODAL / CARTA DE AMOR PARA JUDITH
+   ========================================================= */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modal-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.letter-card {
+    background: linear-gradient(160deg, rgba(28, 24, 15, 0.95), rgba(14, 14, 18, 0.98));
+    border: 1px solid rgba(255, 215, 0, 0.45);
+    border-radius: 24px;
+    max-width: 520px;
+    width: 100%;
+    padding: clamp(24px, 5vw, 36px);
+    position: relative;
+    box-shadow: 
+        0 0 50px rgba(255, 215, 0, 0.25),
+        0 20px 40px rgba(0, 0, 0, 0.8);
+    transform: translateY(30px) scale(0.95);
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: 88vh;
+    overflow-y: auto;
+}
+
+.modal-overlay.active .letter-card {
+    transform: translateY(0) scale(1);
+}
+
+.modal-close {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 28px;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+}
+
+.modal-close:hover {
+    color: var(--gold-primary);
+}
+
+.letter-decoration {
+    font-size: 2.2rem;
+    margin-bottom: 12px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.letter-tag {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--gold-bright);
+    font-weight: 600;
+}
+
+.letter-header h2 {
+    font-family: var(--font-serif);
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    color: #ffffff;
+    margin-top: 4px;
+    margin-bottom: 16px;
+    text-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+}
+
+.lyric-quote {
+    background: rgba(255, 215, 0, 0.08);
+    border-left: 3px solid var(--gold-primary);
+    padding: 12px 16px;
+    border-radius: 0 12px 12px 0;
+    font-family: var(--font-heading);
+    font-size: 1.35rem;
+    line-height: 1.4;
+    color: #fff4ba;
+    margin-bottom: 18px;
+}
+
+.letter-body p {
+    font-size: 1rem;
+    line-height: 1.65;
+    color: rgba(255, 255, 255, 0.88);
+    margin-bottom: 14px;
+}
+
+.letter-highlight {
+    color: #fff9d2 !important;
+    font-weight: 500;
+}
+
+.letter-footer {
+    margin-top: 24px;
+    border-top: 1px solid rgba(255, 215, 0, 0.2);
+    padding-top: 18px;
+    text-align: right;
+}
+
+.signature {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.signature-name {
+    font-family: var(--font-heading);
+    font-size: 1.6rem;
+    color: var(--gold-bright);
+    font-weight: 700;
+    margin-bottom: 16px;
+}
+
+.letter-accept-btn {
+    background: linear-gradient(135deg, var(--gold-primary), #ff9800);
+    border: none;
+    color: #141000;
+    font-weight: 700;
+    font-size: 0.95rem;
+    padding: 10px 22px;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+    transition: all 0.25s ease;
+}
+
+.letter-accept-btn:hover {
+    transform: scale(1.04);
+    box-shadow: 0 6px 20px rgba(255, 215, 0, 0.6);
+}
+
+/* =========================================================
+   TOAST FLOTANTE AL TOCAR FLORES
+   ========================================================= */
+
+.floating-toast {
+    position: fixed;
+    top: 30%;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(20, 18, 10, 0.92);
+    border: 1px solid rgba(255, 215, 0, 0.7);
+    box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+    border-radius: 30px;
+    padding: 10px 22px;
+    color: #ffffff;
+    font-size: 1.05rem;
+    font-family: var(--font-heading);
+    font-weight: 700;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 80;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.floating-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* =========================================================
+   KEYFRAMES Y ANIMACIONES
+   ========================================================= */
+
+@keyframes neonPulse {
+    0% {
+        text-shadow: 
+            0 0 10px #ffe600,
+            0 0 25px #ffc107,
+            0 0 45px #ff9800,
+            0 0 60px rgba(255, 152, 0, 0.5);
+    }
+    100% {
+        text-shadow: 
+            0 0 15px #ffff8d,
+            0 0 35px #ffe600,
+            0 0 60px #ffb300,
+            0 0 90px rgba(255, 179, 0, 0.8);
+    }
+}
+
+@keyframes gentleRotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes startPulse {
+    0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.7), 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+    50% {
+        transform: scale(1.04);
+        box-shadow: 0 0 45px rgba(255, 215, 0, 0.95), 0 15px 40px rgba(0, 0, 0, 0.7);
+    }
+}
+
+@keyframes waveBounce {
+    0% {
+        height: 4px;
+    }
+    100% {
+        height: 18px;
+    }
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* =========================================================
+   RESPONSIVIDAD (MÓVIL Y PANTALLAS PEQUEÑAS)
+   ========================================================= */
+
+@media (max-width: 600px) {
+    .ui-container {
+        padding: 10px 12px;
+    }
+
+    .bottom-card {
+        padding: 12px 14px;
+        border-radius: 16px;
+    }
+
+    .author-row {
+        margin-bottom: 6px;
+    }
+
+    .bottom-caption {
+        font-size: 0.8rem;
+        margin-bottom: 8px;
+    }
+
+    .music-player-bar {
+        padding: 6px 10px;
+    }
+
+    .interaction-hint {
+        font-size: 0.72rem;
+        padding: 4px 12px;
+    }
+}

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="description" content="Un universo cósmico de flores amarillas creado especialmente para Judith 🌻💛">
+    <title>FLORES AMARILLAS PARA TI MI AMOR JUDITH 🌻💛</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;1,400;1,600&family=Quicksand:wght@500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Three.js y OrbitControls -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+
+<body>
+
+    <!-- Canvas 3D para la galaxia cósmica -->
+    <canvas id="galaxyCanvas"></canvas>
+
+    <!-- Contenedor de la interfaz interactiva -->
+    <div class="ui-container">
+
+        <!-- Encabezado superior con estilo Neón idéntico a la imagen -->
+        <header class="header-neon" id="headerNeon">
+            <h2 class="neon-sub">Feliz día de las</h2>
+            <h1 class="neon-main">Flores Amarillas <span class="sunflower-emoji">🌻</span></h1>
+            <p class="neon-recipient">Especialmente para ti Mi Bonita, <span class="name-highlight">Judith</span> 💛</p>
+        </header>
+
+        <!-- Indicador de interacción 3D -->
+        <div class="interaction-hint" id="interactionHint">
+            <span>✨ Toca o arrastra para explorar el universo 3D • Toca una flor 🌻</span>
+        </div>
+
+        <!-- Botón flotante para iniciar música si está en silencio -->
+        <div class="start-prompt" id="startPrompt">
+            <button class="start-btn" id="startBtn" type="button">
+                <span class="btn-sparkle">✨</span>
+                <span>Toca para activar música y sorpresa 💛</span>
+                <span class="btn-sparkle">🌻</span>
+            </button>
+        </div>
+
+        <!-- Panel inferior estilo TikTok / Dedicatoria -->
+        <footer class="bottom-card" id="bottomCard">
+            <div class="author-row">
+                <div class="author-avatar">🌻</div>
+                <div class="author-info">
+                    <span class="author-name">Judith <span class="heart-icon">🤍</span> <span
+                            class="flower-icon">🌻</span> • 28/12</span>
+                    <span class="author-sub">Mi persona favorita en el universo</span>
+                </div>
+                <button class="letter-trigger-btn" id="openLetterBtn" type="button" title="Leer carta para Judith">
+                    💌 Ver carta
+                </button>
+            </div>
+
+            <p class="bottom-caption">
+                Para la chica más hermosa que llena de luz cada rincón de mi mundo 🌻✨
+                <span class="caption-quote">"Fue un día como cualquiera, nunca olvidaré la fecha..."</span>
+            </p>
+
+            <!-- Barra de música Río Roma -->
+            <div class="music-player-bar" id="musicBar">
+                <button class="music-control-btn" id="musicButton" type="button"
+                    aria-label="Reproducir o pausar música">
+                    <span class="music-icon" id="musicIcon">▶</span>
+                </button>
+
+                <div class="music-track-info" id="musicInfo">
+                    <div class="track-marquee">
+                        <span class="music-note-icon">♫</span>
+                        <span class="track-title">Río Roma — Mi Persona Favorita ("Fue un día como
+                            cualquiera...")</span>
+                    </div>
+                    <span class="track-status" id="trackStatus">Toca para reproducir</span>
+                </div>
+
+                <div class="sound-waves" id="soundWaves">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Modal / Carta de amor interactiva para Judith -->
+    <div class="modal-overlay" id="letterModal" aria-hidden="true">
+        <div class="letter-card">
+            <button class="modal-close" id="closeLetterBtn" type="button" aria-label="Cerrar carta">&times;</button>
+
+            <div class="letter-decoration">
+                <span class="letter-flower">🌻</span>
+                <span class="letter-sparkle">✨</span>
+            </div>
+
+            <div class="letter-header">
+                <span class="letter-tag">Para la persona más especial</span>
+                <h2>Querida Judith 💛</h2>
+            </div>
+
+            <div class="letter-body">
+                <p class="lyric-quote">
+                    «Fue un día como cualquiera, nunca olvidaré la fecha...<br>
+                    coincidimos sin pensar en tiempo y en espacio...<br>
+                    ¡Mi persona favorita!» 🎶
+                </p>
+
+                <p>
+                    Hoy quise traerte un universo entero de <strong>flores amarillas</strong>, porque una sola en este
+                    mundo no alcanzaría para representar lo increíble y valiosa que eres para mi.
+                </p>
+
+                <p>
+                    Estas flores simbolizan la alegría que contagias, la calidez de tu sonrisa, la esperanza y la luz
+                    tan bonita que le das a mis días. Eres sol en los días nublados eres mi todo.
+                </p>
+
+                <p class="letter-highlight">
+                    ¡Gracias por ser exactamente como eres! Nunca olvides lo mucho que te amo¡.
+                </p>
+            </div>
+
+            <div class="letter-footer">
+                <p class="signature">Con todo mi cariño para ti, siempre,</p>
+                <p class="signature-name">El que nunca dejara de amarte L 💛🌻</p>
+                <button class="letter-accept-btn" id="acceptLetterBtn" type="button">Guardar este momento 🌻</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast emergente para frases de flores -->
+    <div class="floating-toast" id="flowerToast" aria-hidden="true">
+        <span class="toast-icon">🌻</span>
+        <span class="toast-text" id="toastText">Judith, Mi mundo entero ✨</span>
+    </div>
+
+    <!-- Audio elemento principal (reproduce el archivo de música local) -->
+    <audio id="backgroundMusic" loop preload="auto">
+        <source src="assets/musica.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Reproductor oculto de YouTube como respaldo oficial de Río Roma -->
+    <div id="ytPlayerContainer" style="display:none; position:absolute; left:-9999px; width:1px; height:1px;">
+        <div id="ytPlayer"></div>
+    </div>
+
+    <!-- Script principal de la aplicación -->
+    <script src="script.js"></script>
+
+</body>
+
+</html>
